@@ -6,7 +6,7 @@ B站直播websocket hook框架
 
 ## 使用例
 ### 1. 把同传弹幕改成顶端弹幕并高亮
-```sh
+```javascript
 // ==UserScript==
 // @name         bliveproxy-demo1
 // @namespace    http://tampermonkey.net/
@@ -45,7 +45,7 @@ B站直播websocket hook框架
 ![截图1](https://github.com/xfgryujk/bliveproxy/blob/master/screenshots/1.png)
 
 ### 2. 把打赏全换成自己的名字
-```sh
+```javascript
 // ==UserScript==
 // @name         bliveproxy-demo2
 // @namespace    http://tampermonkey.net/
