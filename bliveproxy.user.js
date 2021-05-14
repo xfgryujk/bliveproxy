@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         bliveproxy
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  B站直播websocket hook框架
 // @author       xfgryujk
 // @include      /https?:\/\/live\.bilibili\.com\/?\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/\d+\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*/
-// @require      https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.10/pako.min.js
+// @run-at       document-start
+// @require      https://cdn.jsdelivr.net/gh/google/brotli@v1.0/js/decode.js
+// @require      https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.js
 // @grant        none
 // ==/UserScript==
 
@@ -24,6 +26,7 @@
   const WS_BODY_PROTOCOL_VERSION_INFLATE = 0
   const WS_BODY_PROTOCOL_VERSION_NORMAL = 1
   const WS_BODY_PROTOCOL_VERSION_DEFLATE = 2
+  const WS_BODY_PROTOCOL_VERSION_BROTLI = 3
 
   const OP_HEARTBEAT_REPLY = 3
   const OP_SEND_MSG_REPLY = 5
@@ -146,12 +149,19 @@
 
       let body = new Uint8Array(data.buffer, offset + HEADER_SIZE, packLen - HEADER_SIZE)
       if (operation === OP_SEND_MSG_REPLY) {
-        if (ver == WS_BODY_PROTOCOL_VERSION_DEFLATE) {
+        switch (ver) {
+        case WS_BODY_PROTOCOL_VERSION_BROTLI:
+          body = BrotliDecode(body)
+          handleMessage(body, callRealOnMessageByPacket)
+          break
+        case WS_BODY_PROTOCOL_VERSION_DEFLATE:
           body = pako.inflate(body)
           handleMessage(body, callRealOnMessageByPacket)
-        } else {
+          break
+        default:
           body = JSON.parse(textDecoder.decode(body))
           handleCommand(body, callRealOnMessageByPacket)
+          break
         }
       } else {
         let packet = makePacketFromUint8Array(body, operation)
