@@ -8,8 +8,8 @@
 // @include      /https?:\/\/live\.bilibili\.com\/\d+\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*/
 // @run-at       document-start
-// @require      https://cdn.jsdelivr.net/gh/google/brotli@v1.0/js/decode.js
-// @require      https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.js
+// @require      https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.js
+// @require      https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.min.js
 // @grant        none
 // ==/UserScript==
 
