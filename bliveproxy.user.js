@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         bliveproxy
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  B站直播websocket hook框架
 // @author       xfgryujk
 // @include      /https?:\/\/live\.bilibili\.com\/?\??.*/
@@ -18,6 +18,8 @@
 //   let info = command.info
 //   info[1] = '测试'
 // })
+//
+// 如果@grant不是none，则要使用unsafeWindow.bliveproxy
 
 (function() {
   const HEADER_SIZE = 16
@@ -30,11 +32,17 @@
   const OP_SEND_MSG_REPLY = 5 // WS_OP_MESSAGE
   const OP_AUTH_REPLY = 8 // WS_OP_CONNECT_SUCCESS
 
+  // 兼容@grant不是none的情况
+  let pageWindow = window
+  if (typeof unsafeWindow !== 'undefined') {
+    pageWindow = unsafeWindow
+  }
+
   let textEncoder = new TextEncoder()
   let textDecoder = new TextDecoder()
 
   function main() {
-    if (window.bliveproxy) {
+    if (pageWindow.bliveproxy) {
       // 防止多次加载
       return
     }
@@ -43,7 +51,7 @@
   }
 
   function initApi() {
-    window.bliveproxy = api
+    pageWindow.bliveproxy = api
   }
 
   let api = {
@@ -70,7 +78,7 @@
   }
 
   function hook() {
-    window.WebSocket = new Proxy(window.WebSocket, {
+    pageWindow.WebSocket = new Proxy(pageWindow.WebSocket, {
       construct(target, args) {
         let obj = new target(...args)
         return new Proxy(obj, proxyHandler)
